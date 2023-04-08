@@ -1,20 +1,44 @@
-import React from "react";
-
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { routes } from "../routes";
 
 const Card = ({ name, username, id }) => {
+  const [isFav, setIsFav] = useState(false);
 
-  const addFav = ()=>{
-    // Aqui iria la logica para agregar la Card en el localStorage
-  }
+  useEffect(() => {
+    const favs = JSON.parse(localStorage.getItem("favorites")) || [];
+    const isFav = favs.find((fav) => fav.id === id) ? true : false;
+    setIsFav(isFav);
+  }, [id]);
+
+  const addFav = () => {
+    const favs = JSON.parse(localStorage.getItem("favorites")) || [];
+    const newFavs = favs.filter((fav) => fav.id !== id);
+    setIsFav(!isFav);
+
+    if (isFav) {
+      localStorage.setItem("favorites", JSON.stringify(newFavs));
+      return;
+    }
+
+    localStorage.setItem(
+      "favorites",
+      JSON.stringify([...favs, { name, username, id }])
+    );
+  };
 
   return (
-    <div className="card">
-        {/* En cada card deberan mostrar en name - username y el id */}
-
-        {/* No debes olvidar que la Card a su vez servira como Link hacia la pagina de detalle */}
-
-        {/* Ademas deberan integrar la logica para guardar cada Card en el localStorage */}
-        <button onClick={addFav} className="favButton">Add fav</button>
+    <div className="card" key={id}>
+      <img className="doctor-img" src="./images/doctor.jpg" alt="DH-logo"/>
+      <h3>{id}</h3>
+      <h2>{name}</h2>
+      <h3>{username}</h3>
+      <Link key={id} to={"/dentista/" + id}>
+        Details
+      </Link>
+      <button onClick={addFav} className="favButton">
+        🖤
+      </button>
     </div>
   );
 };
